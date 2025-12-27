@@ -1,0 +1,15 @@
+assert_lefthook_installed: true
+pre-commit:
+  parallel: true
+  jobs:
+    - name: Code Style
+      run: 'vendor/bin/rector process -- {staged_files} && vendor/bin/php-cs-fixer --config=.php-cs-fixer.php fix -- {staged_files}'
+      glob: '**/*.php'
+      stage_fixed: true
+    - name: Analyze
+      run: 'vendor/bin/phpstan analyze --no-progress --memory-limit=-1 -- {staged_files}'
+      glob: '**/*.php'
+commit-msg:
+  jobs:
+    - name: Commit Lint
+      run: 'npx commitlint --edit {0}'

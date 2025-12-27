@@ -1,0 +1,42 @@
+{
+    "name": "rvxlab/laravel-cronless-scheduler",
+    "description": "Run Laravel's scheduler without cron jobs",
+    "license": "MIT",
+    "type": "library",
+    "version": "0.0.1",
+    "authors": [
+        {
+            "name": "RVxLab",
+            "email": "code@rvx.works"
+        }
+    ],
+    "require": {
+        "php": "^8.2"
+    },
+    "require-dev": {
+        "ergebnis/composer-normalize": "^2.48",
+        "friendsofphp/php-cs-fixer": "^3.92",
+        "phpstan/phpstan": "^2.1",
+        "rector/rector": "^2.3",
+        "rvxlab/php-cs-fixer-rules": "^2.0"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "RVxLab\\CronlessScheduler\\": "src/",
+            "Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true
+        },
+        "sort-packages": true
+    },
+    "scripts": {
+        "lint": "./vendor/bin/php-cs-fixer fix --config .php-cs-fixer.php",
+        "phpstan": "./vendor/bin/phpstan analyze --memory-limit=-1",
+        "rector": "./vendor/bin/rector"
+    }
+}

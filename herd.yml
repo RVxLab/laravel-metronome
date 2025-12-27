@@ -1,0 +1,7 @@
+name: laravel-cronless-scheduler
+php: '8.2'
+secured: false
+aliases: {  }
+services: {  }
+integrations:
+    forge: {  }
