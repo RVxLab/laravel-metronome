@@ -16,6 +16,7 @@
     "require-dev": {
         "ergebnis/composer-normalize": "^2.48",
         "friendsofphp/php-cs-fixer": "^3.92",
+        "orchestra/testbench": "^10.8",
         "phpstan/phpstan": "^2.1",
         "rector/rector": "^2.3",
         "rvxlab/php-cs-fixer-rules": "^2.0"
@@ -38,5 +39,6 @@
         "lint": "./vendor/bin/php-cs-fixer fix --config .php-cs-fixer.php",
         "phpstan": "./vendor/bin/phpstan analyze --memory-limit=-1",
         "rector": "./vendor/bin/rector"
+        "artisan:symlink": "@php -r \"!file_exists('artisan') && !is_link('artisan') && symlink('vendor/bin/testbench', 'artisan');\""
     }
 }

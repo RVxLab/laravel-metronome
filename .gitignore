@@ -10,3 +10,7 @@ node_modules/
 
 # Editors
 .idea/
+
+# Misc
+# artisan is a generated symlink
+artisan
