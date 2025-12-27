@@ -6,10 +6,11 @@ namespace RVxLab\CronlessScheduler\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Contracts\Cache\Repository as Cache;
-use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
-use Revolt\EventLoop;
+use RVxLab\CronlessScheduler\EventLoop\SchedulerEventLoop;
+
+//use Illuminate\Contracts\Cache\Repository as Cache;
+//use Illuminate\Contracts\Debug\ExceptionHandler;
 
 final class StartCronlessScheduleCommand extends Command
 {
@@ -17,27 +18,19 @@ final class StartCronlessScheduleCommand extends Command
 
     protected $description = 'Start the scheduler';
 
-    public function handle(
-        Schedule $schedule,
-        Dispatcher $dispatcher,
-        Cache $cache,
-        ExceptionHandler $exceptionHandler,
-    ): int {
+    public function handle(): never
+    {
         $this->info('Starting!');
 
-        $ticker = EventLoop::repeat(1, function (): void {
-            $this->info(sprintf("Tick: %s\n", date("Y-m-d H:i:s")));
-        });
+        $eventLoop = new SchedulerEventLoop(
+            $this->laravel,
+            $this->laravel->get(Schedule::class),
+            $this->laravel->get(Dispatcher::class),
+            //            $this->laravel->get(Cache::class),
+            //            $this->laravel->get(ExceptionHandler::class),
+            $this->outputComponents(),
+        );
 
-        EventLoop::onSignal(SIGINT, function () use ($ticker): never {
-            $this->newLine();
-            $this->warn('Received interrupt signal, preparing to exit');
-            EventLoop::cancel($ticker);
-            exit(self::SUCCESS);
-        });
-
-        EventLoop::run();
-
-        return self::SUCCESS;
+        $eventLoop->run();
     }
 }
