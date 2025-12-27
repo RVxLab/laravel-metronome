@@ -12,8 +12,10 @@
     ],
     "require": {
         "php": "^8.2",
+        "ext-pcntl": "*",
         "illuminate/console": "^12",
-        "illuminate/support": "^12"
+        "illuminate/support": "^12",
+        "revolt/event-loop": "^1.0"
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.48",
