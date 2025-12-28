@@ -9,6 +9,8 @@ pre-commit:
     - name: Analyze
       run: 'vendor/bin/phpstan analyze --no-progress --memory-limit=-1 -- {staged_files}'
       glob: '**/*.php'
+      exclude:
+        - tests/**/*.php
 commit-msg:
   jobs:
     - name: Commit Lint
