@@ -1,1 +1,4 @@
 laravel: '@testbench'
+
+env:
+  - CACHE_STORE=array
