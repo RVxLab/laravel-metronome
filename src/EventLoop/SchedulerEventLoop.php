@@ -12,12 +12,13 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Collection;
 use Revolt\EventLoop;
+use RVxLab\CronlessScheduler\Validation\EventDispatchValidator;
 use WeakMap;
 
 final class SchedulerEventLoop
 {
-    /** @var WeakMap<Event, CarbonImmutable> */
-    private WeakMap $seenEvents;
+    /** @var WeakMap<Event, int> */
+    private WeakMap $runEvents;
 
     private string $scheduleTickerId;
 
@@ -26,18 +27,22 @@ final class SchedulerEventLoop
         private readonly Schedule $schedule,
         private readonly Dispatcher $dispatcher,
         private readonly Output $components,
+        private readonly EventDispatchValidator $validator,
     ) {
-        $this->seenEvents = new WeakMap();
+        $this->runEvents = new WeakMap();
     }
 
     public function run(): never
     {
         $this->scheduleTickerId = EventLoop::repeat(1, function (): void {
             foreach ($this->getDueEvents() as $event) {
-                if ($this->shouldDispatchEvent($event)) {
+                $lastRun = $this->getLastRunForEvent($event);
+                $now = CarbonImmutable::now();
+
+                if ($this->validator->canDispatch($event, $lastRun, $now)) {
                     $this->components->info($event->getSummaryForDisplay());
 
-                    $this->seenEvents[$event] = CarbonImmutable::now();
+                    $this->runEvents[$event] = CarbonImmutable::now()->getTimestampMs();
 
                     continue;
                 }
@@ -58,43 +63,28 @@ final class SchedulerEventLoop
     }
 
     /**
+     * Type-safe wrapper around Schedule::dueEvents
+     *
      * @return Collection<int, Event>
+     *
+     * @see Schedule::dueEvents()
      */
     private function getDueEvents(): Collection
     {
         return $this->schedule->dueEvents($this->app);
     }
 
-    private function shouldDispatchEvent(Event $event): bool
+    /**
+     * Get the last run timestamp for the given event, if it was run before
+     */
+    private function getLastRunForEvent(Event $event): ?CarbonImmutable
     {
-        // If the event is not passing the cron expression, don't run
-        if (!$event->filtersPass($this->app)) {
-            return false;
+        $lastRunTimestampMs = $this->runEvents[$event] ?? null;
+
+        if (null === $lastRunTimestampMs) {
+            return null;
         }
 
-        // If the event is repeatable and has been run within the last n seconds, run
-        if ($event->isRepeatable() && !$this->wasEventRunRecently($event, (int) $event->repeatSeconds)) {
-            return true;
-        }
-
-        // If the event has already been run within the last 60 seconds, don't run
-        return !$this->wasEventRunRecently($event, 60);
-    }
-
-    private function wasEventRunRecently(Event $event, int $seconds): bool
-    {
-        if (1 === $seconds) {
-            return false;
-        }
-
-        $lastSeen = $this->seenEvents[$event] ?? null;
-
-        if (null === $lastSeen) {
-            return false;
-        }
-
-        $secondsSinceLastRun = CarbonImmutable::now()->diffInSeconds($lastSeen, true);
-
-        return $secondsSinceLastRun < $seconds;
+        return CarbonImmutable::createFromTimestampMs($lastRunTimestampMs);
     }
 }

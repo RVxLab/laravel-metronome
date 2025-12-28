@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Events\Dispatcher;
 use RVxLab\CronlessScheduler\EventLoop\SchedulerEventLoop;
+use RVxLab\CronlessScheduler\Validation\EventDispatchValidator;
 
 //use Illuminate\Contracts\Cache\Repository as Cache;
 //use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -29,6 +30,7 @@ final class StartCronlessScheduleCommand extends Command
             //            $this->laravel->get(Cache::class),
             //            $this->laravel->get(ExceptionHandler::class),
             $this->outputComponents(),
+            new EventDispatchValidator($this->laravel),
         );
 
         $eventLoop->run();
