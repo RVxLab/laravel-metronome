@@ -71,7 +71,6 @@ final class SchedulerEventLoop
 
         EventLoop::onSignal(SIGINT, function (): never {
             EventLoop::cancel($this->scheduleTickerId);
-            $this->components->error('Boom!');
             exit(0);
         });
 
