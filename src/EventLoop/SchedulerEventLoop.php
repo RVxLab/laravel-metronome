@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace RVxLab\CronlessScheduler\EventLoop;
 
 use Carbon\CarbonImmutable;
-use Illuminate\Console\Events\ScheduledTaskSkipped;
-use Illuminate\Console\Scheduling\{Event, Schedule};
+use Exception;
+use Illuminate\Console\Events\{ScheduledTaskFailed, ScheduledTaskFinished, ScheduledTaskSkipped, ScheduledTaskStarting};
+use Illuminate\Console\Scheduling\{CallbackEvent, Event, Schedule};
 use Illuminate\Console\View\Components\Factory as Output;
+use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Support\Collection;
+use Illuminate\Support\{Carbon, Collection};
 use Revolt\EventLoop;
 use RVxLab\CronlessScheduler\Validation\EventDispatchValidator;
+use Throwable;
 use WeakMap;
 
 final class SchedulerEventLoop
@@ -24,8 +28,11 @@ final class SchedulerEventLoop
 
     public function __construct(
         private readonly Application $app,
+        private readonly string $phpBinary,
         private readonly Schedule $schedule,
         private readonly Dispatcher $dispatcher,
+        private readonly Cache $cache,
+        private readonly ExceptionHandler $exceptionHandler,
         private readonly Output $components,
         private readonly EventDispatchValidator $validator,
     ) {
@@ -36,18 +43,29 @@ final class SchedulerEventLoop
     {
         $this->scheduleTickerId = EventLoop::repeat($tickRate, function (): void {
             foreach ($this->getDueEvents() as $event) {
+                // TODO: Find a more elegant way to handle this
+                if ($event->isRepeatable()) {
+                    $this->cache->forget('illuminate:schedule:interrupt');
+                }
+
                 $lastRun = $this->getLastRunForEvent($event);
                 $now = CarbonImmutable::now();
 
-                if ($this->validator->canDispatch($event, $lastRun, $now)) {
-                    $this->components->info($event->getSummaryForDisplay());
-
-                    $this->runEvents[$event] = CarbonImmutable::now()->getTimestampMs();
+                if (!$this->validator->canDispatch($event, $lastRun, $now)) {
+                    $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
 
                     continue;
                 }
 
-                $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
+                EventLoop::queue(function (Event $event): void {
+                    $this->dispatchEvent($event);
+
+                    // Set the run event properly right after execution
+                    $this->runEvents[$event] = CarbonImmutable::now()->getTimestampMs();
+                }, $event);
+
+                // Set the run event so that it can't be picked up twice
+                $this->runEvents[$event] = CarbonImmutable::now()->getTimestampMs();
             }
         });
 
@@ -86,5 +104,52 @@ final class SchedulerEventLoop
         }
 
         return CarbonImmutable::createFromTimestampMs($lastRunTimestampMs);
+    }
+
+    private function dispatchEvent(Event $event): void
+    {
+        $summary = $event->getSummaryForDisplay();
+
+        $command = $event instanceof CallbackEvent
+            ? $summary
+            : trim(str_replace($this->phpBinary, '', (string) $event->command));
+
+        $description = sprintf(
+            '<fg=gray>%s</> Running [%s]%s',
+            Carbon::now()->format('Y-m-d H:i:s'),
+            $command,
+            $event->runInBackground ? ' in background' : '',
+        );
+
+        $this->components->task($description, function () use ($event): bool {
+            $this->dispatcher->dispatch(new ScheduledTaskStarting($event));
+
+            $start = microtime(true);
+
+            try {
+                $event->run($this->app);
+
+                $this->dispatcher->dispatch(new ScheduledTaskFinished(
+                    $event,
+                    round(microtime(true) - $start, 2),
+                ));
+
+                if (0 !== $event->exitCode && !$event->runInBackground) {
+                    throw new Exception(sprintf('Scheduled command [%s] failed with exit code [%s].', $event->command, $event->exitCode));
+                }
+            } catch (Throwable $throwable) {
+                $this->dispatcher->dispatch(new ScheduledTaskFailed($event, $throwable));
+
+                $this->exceptionHandler->report($throwable);
+            }
+
+            return 0 === $event->exitCode;
+        });
+
+        if (!$event instanceof CallbackEvent) {
+            $this->components->bulletList([
+                $event->getSummaryForDisplay(),
+            ]);
+        }
     }
 }

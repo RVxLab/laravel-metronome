@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace RVxLab\CronlessScheduler\Commands;
 
-use Illuminate\Console\Command;
+use Illuminate\Console\{Application, Command};
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ValidatedInput;
 use RVxLab\CronlessScheduler\EventLoop\SchedulerEventLoop;
 use RVxLab\CronlessScheduler\Validation\EventDispatchValidator;
-
-//use Illuminate\Contracts\Cache\Repository as Cache;
-//use Illuminate\Contracts\Debug\ExceptionHandler;
 
 final class StartCronlessScheduleCommand extends Command
 {
@@ -52,14 +51,13 @@ final class StartCronlessScheduleCommand extends Command
             $this->warn('The tick rate is higher than 1, which is not recommended. This may cause timing issues with your scheduled tasks.');
         }
 
-        $this->info('Starting the scheduler.');
-
         $eventLoop = new SchedulerEventLoop(
             app: $this->laravel,
+            phpBinary: Application::phpBinary(),
             schedule: $this->laravel->get(Schedule::class),
             dispatcher: $this->laravel->get(Dispatcher::class),
-            //            $this->laravel->get(Cache::class),
-            //            $this->laravel->get(ExceptionHandler::class),
+            cache: $this->laravel->get(Cache::class),
+            exceptionHandler: $this->laravel->get(ExceptionHandler::class),
             components: $this->outputComponents(),
             validator: new EventDispatchValidator($this->laravel),
         );
