@@ -32,9 +32,9 @@ final class SchedulerEventLoop
         $this->runEvents = new WeakMap();
     }
 
-    public function run(): never
+    public function run(float $tickRate): never
     {
-        $this->scheduleTickerId = EventLoop::repeat(1, function (): void {
+        $this->scheduleTickerId = EventLoop::repeat($tickRate, function (): void {
             foreach ($this->getDueEvents() as $event) {
                 $lastRun = $this->getLastRunForEvent($event);
                 $now = CarbonImmutable::now();
