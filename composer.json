@@ -13,15 +13,15 @@
     "require": {
         "php": "^8.2",
         "ext-pcntl": "*",
-        "illuminate/console": "^12",
-        "illuminate/support": "^12",
+        "illuminate/console": "^12 || ^13",
+        "illuminate/support": "^12 || ^13",
         "revolt/event-loop": "^1.0"
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.48",
         "friendsofphp/php-cs-fixer": "^3.92",
-        "orchestra/testbench": "^10.8",
-        "pestphp/pest": "^4.2",
+        "orchestra/testbench": "^10.8 || ^11.0",
+        "pestphp/pest": "^3.0",
         "phpstan/phpstan": "^2.1",
         "rector/rector": "^2.3",
         "rvxlab/php-cs-fixer-rules": "^2.0"
@@ -56,18 +56,6 @@
         }
     },
     "scripts": {
-        "post-update-cmd": [
-            "@composer normalize"
-        ],
-        "post-package-install": [
-            "@composer normalize"
-        ],
-        "post-package-update": [
-            "@composer normalize"
-        ],
-        "post-package-uninstall": [
-            "@composer normalize"
-        ],
         "post-autoload-dump": [
             "@clear",
             "@prepare"
