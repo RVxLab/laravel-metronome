@@ -57,14 +57,15 @@ final class SchedulerEventLoop
                     continue;
                 }
 
+                // Queue up the event for dispatching. After queueing, we set that the event was "run" so
+                // it cannot be dispatched twice on accident. Then after it was dispatched, we set the
+                // run time again properly so that jobs don't re-run before they should
                 EventLoop::queue(function (Event $event): void {
                     $this->dispatchEvent($event);
 
-                    // Set the run event properly right after execution
                     $this->runEvents[$event] = CarbonImmutable::now()->getTimestampMs();
                 }, $event);
 
-                // Set the run event so that it can't be picked up twice
                 $this->runEvents[$event] = CarbonImmutable::now()->getTimestampMs();
             }
         });
@@ -138,6 +139,8 @@ final class SchedulerEventLoop
                     round(microtime(true) - $start, 2),
                 ));
 
+                // Non-background tasks that exit non-zero are treated as failures.
+                // Background tasks manage their own exit codes independently.
                 if (0 !== $event->exitCode && !$event->runInBackground) {
                     throw new Exception(sprintf('Scheduled command [%s] failed with exit code [%s].', $event->command, $event->exitCode));
                 }
