@@ -51,7 +51,12 @@ final class SchedulerEventLoop
                     continue;
                 }
 
-                if ($event->shouldSkipDueToOverlapping()) {
+                // Use mutex->exists() rather than shouldSkipDueToOverlapping() here.
+                // shouldSkipDueToOverlapping() calls mutex->create(), which acquires the lock,
+                // and when event->run() is later called it also calls shouldSkipDueToOverlapping()
+                // internally. Since the lock is already held, it returns true and bails out early
+                // without setting exitCode, causing a spurious failure exception.
+                if ($event->withoutOverlapping && $event->mutex->exists($event)) {
                     $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
 
                     continue;
@@ -141,7 +146,7 @@ final class SchedulerEventLoop
 
                 // Non-background tasks that exit non-zero are treated as failures.
                 // Background tasks manage their own exit codes independently.
-                if (0 !== $event->exitCode && !$event->runInBackground) {
+                if (null !== $event->exitCode && 0 !== $event->exitCode && !$event->runInBackground) {
                     throw new Exception(sprintf('Scheduled command [%s] failed with exit code [%s].', $event->command, $event->exitCode));
                 }
             } catch (Throwable $throwable) {
@@ -150,7 +155,7 @@ final class SchedulerEventLoop
                 $this->exceptionHandler->report($throwable);
             }
 
-            return 0 === $event->exitCode;
+            return null === $event->exitCode || 0 === $event->exitCode;
         });
 
         if (!$event instanceof CallbackEvent) {
