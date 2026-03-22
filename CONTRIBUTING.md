@@ -30,9 +30,8 @@ Clone your fork, then install the dev dependencies:
 
 ```bash
 composer install
+pnpm install
 ```
-
-This will also install NPM dependencies used for git hooks.
 
 ## Lint
 
