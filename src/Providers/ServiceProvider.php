@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace RVxLab\CronlessScheduler\Providers;
+namespace RVxLab\Metronome\Providers;
 
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Foundation\Application;
-use RVxLab\CronlessScheduler\Commands\StartCronlessScheduleCommand;
-use RVxLab\CronlessScheduler\Validation\EventDispatchValidator;
+use RVxLab\Metronome\Commands\MetronomeCommand;
+use RVxLab\Metronome\Validation\EventDispatchValidator;
 
 final class ServiceProvider extends \Illuminate\Support\ServiceProvider
 {
@@ -26,7 +26,7 @@ final class ServiceProvider extends \Illuminate\Support\ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
-                StartCronlessScheduleCommand::class,
+                MetronomeCommand::class,
             ]);
         }
     }

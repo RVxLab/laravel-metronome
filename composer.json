@@ -1,6 +1,6 @@
 {
-    "name": "rvxlab/laravel-cronless-scheduler",
-    "description": "Run Laravel's scheduler without cron jobs",
+    "name": "rvxlab/laravel-metronome",
+    "description": "Run Laravel's task scheduler using an event loop instead of cron or sleep",
     "license": "MIT",
     "type": "library",
     "version": "0.0.1",
@@ -30,7 +30,7 @@
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
-            "RVxLab\\CronlessScheduler\\": "src/"
+            "RVxLab\\Metronome\\": "src/"
         }
     },
     "autoload-dev": {
@@ -51,7 +51,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "RVxLab\\CronlessScheduler\\Providers\\ServiceProvider"
+                "RVxLab\\Metronome\\Providers\\ServiceProvider"
             ]
         }
     },

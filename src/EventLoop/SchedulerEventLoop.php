@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace RVxLab\CronlessScheduler\EventLoop;
+namespace RVxLab\Metronome\EventLoop;
 
 use Carbon\CarbonImmutable;
 use Exception;
@@ -14,7 +14,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\{Carbon, Collection};
 use Revolt\EventLoop;
-use RVxLab\CronlessScheduler\Validation\EventDispatchValidator;
+use RVxLab\Metronome\Validation\EventDispatchValidator;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 use WeakMap;

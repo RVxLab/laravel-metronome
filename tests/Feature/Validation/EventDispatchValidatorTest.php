@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Carbon\{CarbonImmutable, CarbonInterface};
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Support\Facades\Schedule;
-use RVxLab\CronlessScheduler\Validation\EventDispatchValidator;
+use RVxLab\Metronome\Validation\EventDispatchValidator;
 
 it('allows dispatching an event that was not run recently with a matching cron expression', function (CarbonImmutable $now, Closure $using): void {
     $validator = app(EventDispatchValidator::class);

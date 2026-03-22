@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace RVxLab\CronlessScheduler\Validation;
+namespace RVxLab\Metronome\Validation;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Scheduling\Event;

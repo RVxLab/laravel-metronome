@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace RVxLab\CronlessScheduler\Commands;
+namespace RVxLab\Metronome\Commands;
 
 use Illuminate\Console\{Application as ConsoleApplication, Command};
 use Illuminate\Console\Scheduling\Schedule;
@@ -10,17 +10,17 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ValidatedInput;
-use RVxLab\CronlessScheduler\EventLoop\SchedulerEventLoop;
-use RVxLab\CronlessScheduler\Validation\EventDispatchValidator;
+use RVxLab\Metronome\EventLoop\SchedulerEventLoop;
+use RVxLab\Metronome\Validation\EventDispatchValidator;
 
-final class StartCronlessScheduleCommand extends Command
+final class MetronomeCommand extends Command
 {
     protected $signature = <<<CMD
-        schedule:cronless-start
+        schedule:metronome
             {--t|tick-rate=1 : The time between each scheduler call. This must be a non-zero positive number and should not be higher than 1. Lower tick rates may cause higher CPU usage.}
     CMD;
 
-    protected $description = 'Start the scheduler using a Revolt event loop';
+    protected $description = 'Start the scheduler using an event loop';
 
     public function handle(): int
     {
