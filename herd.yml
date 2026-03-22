@@ -1,7 +1,7 @@
-name: laravel-cronless-scheduler
-php: '8.3'
+name: laravel-metronome
+php: "8.3"
 secured: false
-aliases: { }
-services: { }
+aliases: {}
+services: {}
 integrations:
-    forge: { }
+  forge: {}
