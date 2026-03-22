@@ -50,6 +50,12 @@ final class SchedulerEventLoop
                     continue;
                 }
 
+                if ($event->shouldSkipDueToOverlapping()) {
+                    $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
+
+                    continue;
+                }
+
                 EventLoop::queue(function (Event $event): void {
                     $this->dispatchEvent($event);
 
