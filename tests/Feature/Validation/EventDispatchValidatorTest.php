@@ -67,6 +67,22 @@ it('dispatches if the event fires every 5 seconds and that time has elapsed', fu
         ->and($validator->canDispatch($event, $now, $now->addSeconds(5)))->toBeTrue();
 });
 
+it('does not dispatch a repeatable event that was run recently', function (): void {
+    $now = CarbonImmutable::create(2025, 12, 28, 14, 0, 0);
+
+    $validator = app(EventDispatchValidator::class);
+
+    $event = Schedule::call(fn (): null => null)->everyFiveSeconds();
+
+    // First dispatch should pass
+    expect($validator->canDispatch($event, null, $now))->toBeTrue();
+
+    // 3 seconds later — within the 5-second repeat window — should NOT dispatch.
+    // This is the exact scenario where the old fallthrough bug would have
+    // incorrectly returned true via the 60-second check.
+    expect($validator->canDispatch($event, $now, $now->addSeconds(3)))->toBeFalse();
+});
+
 it('dispatches if the event fires every second', function (): void {
     $now = CarbonImmutable::create(2025, 12, 28, 14, 0, 23);
 
