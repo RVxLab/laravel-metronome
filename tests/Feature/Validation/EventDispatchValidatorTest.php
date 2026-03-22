@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Schedule;
 use RVxLab\CronlessScheduler\Validation\EventDispatchValidator;
 
 it('allows dispatching an event that was not run recently with a matching cron expression', function (CarbonImmutable $now, Closure $using): void {
-    $validator = new EventDispatchValidator(app());
+    $validator = app(EventDispatchValidator::class);
 
     $event = $using(Schedule::call(fn (): null => null));
 
@@ -35,7 +35,7 @@ it('allows dispatching an event that was not run recently with a matching cron e
 it('does not dispatch is the event was dispatched recently', function (): void {
     $now = CarbonImmutable::create(2025, 12, 28, 14, 0, 23);
 
-    $validator = new EventDispatchValidator(app());
+    $validator = app(EventDispatchValidator::class);
 
     $event = Schedule::call(fn (): null => null)->wednesdays()->at('14:00');
 
@@ -46,7 +46,7 @@ it('does not dispatch is the event was dispatched recently', function (): void {
 it('dispatches if the event fires every minute and a minute has elapsed', function (): void {
     $now = CarbonImmutable::create(2025, 12, 28, 14, 0, 23);
 
-    $validator = new EventDispatchValidator(app());
+    $validator = app(EventDispatchValidator::class);
 
     $event = Schedule::call(fn (): null => null)->everyMinute();
 
@@ -58,7 +58,7 @@ it('dispatches if the event fires every minute and a minute has elapsed', functi
 it('dispatches if the event fires every 5 seconds and that time has elapsed', function (): void {
     $now = CarbonImmutable::create(2025, 12, 28, 14, 0, 23);
 
-    $validator = new EventDispatchValidator(app());
+    $validator = app(EventDispatchValidator::class);
 
     $event = Schedule::call(fn (): null => null)->everyFiveSeconds();
 
@@ -70,7 +70,7 @@ it('dispatches if the event fires every 5 seconds and that time has elapsed', fu
 it('dispatches if the event fires every second', function (): void {
     $now = CarbonImmutable::create(2025, 12, 28, 14, 0, 23);
 
-    $validator = new EventDispatchValidator(app());
+    $validator = app(EventDispatchValidator::class);
 
     $event = Schedule::call(fn (): null => null)->everySecond();
 

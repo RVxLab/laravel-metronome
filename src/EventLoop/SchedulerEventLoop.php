@@ -9,7 +9,6 @@ use Exception;
 use Illuminate\Console\Events\{ScheduledTaskFailed, ScheduledTaskFinished, ScheduledTaskSkipped, ScheduledTaskStarting};
 use Illuminate\Console\Scheduling\{CallbackEvent, Event, Schedule};
 use Illuminate\Console\View\Components\Factory as Output;
-use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
@@ -31,7 +30,6 @@ final class SchedulerEventLoop
         private readonly string $phpBinary,
         private readonly Schedule $schedule,
         private readonly Dispatcher $dispatcher,
-        private readonly Cache $cache,
         private readonly ExceptionHandler $exceptionHandler,
         private readonly Output $components,
         private readonly EventDispatchValidator $validator,
@@ -43,11 +41,6 @@ final class SchedulerEventLoop
     {
         $this->scheduleTickerId = EventLoop::repeat($tickRate, function (): void {
             foreach ($this->getDueEvents() as $event) {
-                // TODO: Find a more elegant way to handle this
-                if ($event->isRepeatable()) {
-                    $this->cache->forget('illuminate:schedule:interrupt');
-                }
-
                 $lastRun = $this->getLastRunForEvent($event);
                 $now = CarbonImmutable::now();
 

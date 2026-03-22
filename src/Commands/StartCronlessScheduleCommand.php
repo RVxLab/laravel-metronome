@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace RVxLab\CronlessScheduler\Commands;
 
-use Illuminate\Console\{Application, Command};
+use Illuminate\Console\{Application as ConsoleApplication, Command};
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Facades\Validator;
@@ -21,13 +20,11 @@ final class StartCronlessScheduleCommand extends Command
             {--t|tick-rate=1 : The time between each scheduler call. This must be a non-zero positive number and should not be higher than 1. Lower tick rates may cause higher CPU usage.}
     CMD;
 
-    protected $description = 'Start the scheduler';
+    protected $description = 'Start the scheduler using a Revolt event loop';
 
     public function handle(): int
     {
-        $inputData = $this->options();
-
-        $validator = Validator::make($inputData, [
+        $validator = Validator::make($this->options(), [
             'tick-rate' => 'required|numeric|min:0.01',
         ], [
             'tick-rate.numeric' => 'The tick rate option must be a number.',
@@ -35,10 +32,7 @@ final class StartCronlessScheduleCommand extends Command
 
         if ($validator->fails()) {
             $this->error('Failed to validate options:');
-
-            $errors = $validator->errors()->all();
-
-            $this->components->bulletList($errors);
+            $this->components->bulletList($validator->errors()->all());
 
             return self::INVALID;
         }
@@ -53,17 +47,14 @@ final class StartCronlessScheduleCommand extends Command
 
         $eventLoop = new SchedulerEventLoop(
             app: $this->laravel,
-            phpBinary: Application::phpBinary(),
-            schedule: $this->laravel->get(Schedule::class),
-            dispatcher: $this->laravel->get(Dispatcher::class),
-            cache: $this->laravel->get(Cache::class),
-            exceptionHandler: $this->laravel->get(ExceptionHandler::class),
+            phpBinary: ConsoleApplication::phpBinary(),
+            schedule: $this->laravel->make(Schedule::class),
+            dispatcher: $this->laravel->make(Dispatcher::class),
+            exceptionHandler: $this->laravel->make(ExceptionHandler::class),
             components: $this->outputComponents(),
-            validator: new EventDispatchValidator($this->laravel),
+            validator: $this->laravel->make(EventDispatchValidator::class),
         );
 
-        $eventLoop->run(
-            tickRate: $tickRate,
-        );
+        $eventLoop->run(tickRate: $tickRate);
     }
 }
