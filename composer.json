@@ -61,6 +61,11 @@
         "artisan:symlink": "@php -r \"!file_exists('artisan') && !is_link('artisan') && symlink('vendor/bin/testbench', 'artisan');\"",
         "build": "@php vendor/bin/testbench workbench:build --ansi",
         "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "code-style": [
+            "@rector",
+            "@lint",
+            "@phpstan"
+        ],
         "lint": "./vendor/bin/php-cs-fixer fix --config .php-cs-fixer.php",
         "phpstan": "./vendor/bin/phpstan analyze --memory-limit=-1",
         "prepare": "@php vendor/bin/testbench package:discover --ansi",
