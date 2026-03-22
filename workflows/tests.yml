@@ -1,0 +1,56 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.3', '8.4', '8.5']
+        testbench: ['^10.0', '^11.0']
+        prefer-flag: ['prefer-stable', 'prefer-lowest']
+        include:
+          - testbench: '^10.0'
+            laravel: '12'
+          - testbench: '^11.0'
+            laravel: '13'
+        exclude:
+          - php: '8.2'
+            testbench: '^11.0'
+
+    name: "L${{ matrix.laravel }} / PHP ${{ matrix.php }} / ${{ matrix.prefer-flag }}"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
+          coverage: none
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ matrix.php }}-${{ matrix.testbench }}-${{ matrix.prefer-flag }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            composer-${{ matrix.php }}-${{ matrix.testbench }}-${{ matrix.prefer-flag }}-
+
+      - name: Install dependencies
+        run: |
+          composer require "orchestra/testbench:${{ matrix.testbench }}" --no-update
+          composer update --${{ matrix.prefer-flag }} --prefer-dist --no-interaction --no-progress
+
+      - name: Run tests
+        run: vendor/bin/pest --ci
