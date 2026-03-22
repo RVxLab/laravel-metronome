@@ -15,6 +15,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\{Carbon, Collection};
 use Revolt\EventLoop;
 use RVxLab\CronlessScheduler\Validation\EventDispatchValidator;
+use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 use WeakMap;
 
@@ -68,10 +69,15 @@ final class SchedulerEventLoop
             }
         });
 
-        EventLoop::onSignal(SIGINT, function (): never {
+        $stop = function (): never {
             EventLoop::cancel($this->scheduleTickerId);
+            $this->app->terminate();
+            $this->components->warn('Stopping scheduler...', OutputInterface::VERBOSITY_VERBOSE);
             exit(0);
-        });
+        };
+
+        EventLoop::onSignal(SIGINT, $stop);
+        EventLoop::onSignal(SIGTERM, $stop);
 
         EventLoop::run();
 
