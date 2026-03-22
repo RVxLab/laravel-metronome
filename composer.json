@@ -26,8 +26,6 @@
         "rector/rector": "^2.3",
         "rvxlab/php-cs-fixer-rules": "^2.0"
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "RVxLab\\Metronome\\": "src/"
