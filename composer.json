@@ -3,7 +3,7 @@
     "description": "Run Laravel's task scheduler using an event loop instead of cron or sleep",
     "license": "MIT",
     "type": "library",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "authors": [
         {
             "name": "RVxLab",
