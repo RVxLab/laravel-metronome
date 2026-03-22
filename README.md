@@ -77,7 +77,7 @@ stdout_logfile = /var/www/html/storage/logs/metronome.log
 stopwaitsecs = 60
 ```
 
-`numprocs` must be `1` — running multiple instances will cause tasks to fire multiple times. `stopwaitsecs` should be
+`numprocs` must be `1`. Running multiple instances will cause tasks to fire multiple times. `stopwaitsecs` should be
 set
 high enough to allow any currently running tasks to finish before Supervisor force-kills the process.
 
@@ -128,7 +128,7 @@ exits, so process managers like Supervisor and systemd work out of the box.
 
 |                            | `schedule:work` | `schedule:metronome` |
 |----------------------------|-----------------|----------------------|
-| Tick mechanism             | `sleep(60)`     | Event loop           |
+| Tick mechanism             | Cron            | Event loop           |
 | Default tick rate          | 60 seconds      | 1 second             |
 | Configurable tick rate     | No              | Yes                  |
 | Sub-minute precision       | Best effort     | High precision       |
