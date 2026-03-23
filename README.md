@@ -124,18 +124,6 @@ CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]
 Send `SIGINT` (Ctrl+C) or `SIGTERM` to stop the process cleanly. Laravel's shutdown logic runs before the process
 exits, so process managers like Supervisor and systemd work out of the box.
 
-## Differences from `schedule:work`
-
-|                            | `schedule:work` | `schedule:metronome` |
-|----------------------------|-----------------|----------------------|
-| Tick mechanism             | Cron            | Event loop           |
-| Default tick rate          | 60 seconds      | 1 second             |
-| Configurable tick rate     | No              | Yes                  |
-| Sub-minute precision       | Best effort     | High precision       |
-| Overlap protection         | Yes             | Yes                  |
-| Laravel events             | Yes             | Yes                  |
-| Filters (`->when()`, etc.) | Yes             | Yes                  |
-
 ## Known limitations
 
 - Last-run state is held in memory and not persisted across process restarts. A task that ran shortly before a crash may
