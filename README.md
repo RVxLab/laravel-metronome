@@ -22,25 +22,15 @@ Replace your `schedule:work` invocation with:
 php artisan metronome:start
 ```
 
-### Tick rate
+## Configuration
 
-The tick rate controls how often the scheduler checks for due tasks in seconds. By default, the tick rate is 1 second.
-You can change the tick rate by passing the `--tick-rate` or `-t` option:
+Metronome can be configured with the following environment variables:
 
-```bash
-# Default, suitable for most workloads
-php artisan metronome:start --tick-rate=1
+| Environment Variable | Default Value | Description |
+| -------------------- | ------------- | ----------- |
+| `METRONOME_TICK_RATE` | `1.0` | The time between each scheduler call in seconds. Must be greater than `0`. Lower values may increase CPU usage and values above 1 are not recommended due to dropped tasks. |
 
-# Check twice per second, useful for high-frequency sub-minute tasks
-php artisan metronome:start --tick-rate=0.5
-
-# Minimum allowed value (100 times per second), rarely needed in practice
-php artisan metronome:start --tick-rate=0.01
-```
-
-Lower tick rates increase the number of times the scheduler checks for due tasks, which can be helpful if your workload
-relies on sub-minute scheduling or if you have a large number of small tasks scheduled. It's worth keeping in mind that
-lowering the tick rate will increase the CPU usage slightly. In most cases the difference is negligible (< 0.1%).
+If you need more control over the config, you can publish it using `php artisan vendor:publish --tag laravel-metronome:config`.
 
 ## Overlap Protection
 
