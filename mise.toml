@@ -1,3 +1,13 @@
 [tools]
 lefthook = "2"
 node = "24"
+watchexec = "2.8.0"
+
+[tasks."test:fail-fast"]
+description = "Run tests and stop on first failure"
+run = "composer run test -- --stop-on-defect"
+
+[tasks."test:watch:fail-fast"]
+description = "Watch source files and run tests on changes, stopping on first failure"
+run = "mise watch test:fail-fast --exts php"
+
