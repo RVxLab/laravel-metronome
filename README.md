@@ -19,7 +19,7 @@ composer require rvxlab/laravel-metronome
 Replace your `schedule:work` invocation with:
 
 ```bash
-php artisan schedule:metronome
+php artisan metronome:start
 ```
 
 ### Tick rate
@@ -29,13 +29,13 @@ You can change the tick rate by passing the `--tick-rate` or `-t` option:
 
 ```bash
 # Default, suitable for most workloads
-php artisan schedule:metronome --tick-rate=1
+php artisan metronome:start --tick-rate=1
 
 # Check twice per second, useful for high-frequency sub-minute tasks
-php artisan schedule:metronome --tick-rate=0.5
+php artisan metronome:start --tick-rate=0.5
 
 # Minimum allowed value (100 times per second), rarely needed in practice
-php artisan schedule:metronome --tick-rate=0.01
+php artisan metronome:start --tick-rate=0.01
 ```
 
 Lower tick rates increase the number of times the scheduler checks for due tasks, which can be helpful if your workload
@@ -65,7 +65,7 @@ setup.
 ```ini
 [program:laravel-metronome]
 process_name = %(program_name)s_%(process_num)02d
-command = php /var/www/html/artisan schedule:metronome
+command = php /var/www/html/artisan metronome:start
 autostart = true
 autorestart = true
 stopasgroup = true
@@ -97,7 +97,7 @@ WORKDIR /var/www/html
 
 COPY . .
 
-CMD ["php", "artisan", "schedule:metronome"]
+CMD ["php", "artisan", "metronome:start"]
 ```
 
 Or with Supervisor, if you need it running alongside other processes:

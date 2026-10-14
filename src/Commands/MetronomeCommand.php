@@ -17,7 +17,7 @@ use Illuminate\Validation\ValidationException;
 final class MetronomeCommand extends Command
 {
     protected $signature = <<<CMD
-        schedule:metronome
+        metronome:start
     CMD;
 
     protected $description = 'Start the scheduler using an event loop';
