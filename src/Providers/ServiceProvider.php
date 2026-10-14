@@ -11,6 +11,8 @@ use RVxLab\Metronome\Validation\EventDispatchValidator;
 
 final class ServiceProvider extends \Illuminate\Support\ServiceProvider
 {
+    private const PUBLISH_GROUP_PREFIX = 'laravel-metronome:';
+
     public function register(): void
     {
         $this->app->bind(
@@ -24,10 +26,26 @@ final class ServiceProvider extends \Illuminate\Support\ServiceProvider
 
     public function boot(): void
     {
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                MetronomeCommand::class,
-            ]);
+        if (!$this->app->runningInConsole()) {
+            return;
         }
+
+        $this->commands([
+            MetronomeCommand::class,
+        ]);
+
+        $this->mergeConfigFrom(
+            __DIR__ . '/../../config/metronome.php',
+            'metronome',
+        );
+
+        $this->publishes([
+            __DIR__ . '/../../config/metronome.php' => config_path('metronome.php'),
+        ], $this->publishGroup('config'));
+    }
+
+    private function publishGroup(string $suffix): string
+    {
+        return self::PUBLISH_GROUP_PREFIX . $suffix;
     }
 }

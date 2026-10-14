@@ -6,39 +6,39 @@ namespace RVxLab\Metronome\Commands;
 
 use Illuminate\Console\{Application as ConsoleApplication, Command};
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Container\Attributes\Config;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ValidatedInput;
 use RVxLab\Metronome\EventLoop\SchedulerEventLoop;
-use RVxLab\Metronome\Validation\EventDispatchValidator;
+use RVxLab\Metronome\Validation\{EventDispatchValidator, OptionValidator};
+use Illuminate\Validation\ValidationException;
 
 final class MetronomeCommand extends Command
 {
     protected $signature = <<<CMD
         schedule:metronome
-            {--t|tick-rate=1 : The time between each scheduler call. This must be a non-zero positive number and should not be higher than 1. Lower tick rates may cause higher CPU usage.}
     CMD;
 
     protected $description = 'Start the scheduler using an event loop';
 
-    public function handle(): int
-    {
-        $validator = Validator::make($this->options(), [
-            'tick-rate' => 'required|numeric|min:0.01',
-        ], [
-            'tick-rate.numeric' => 'The tick rate option must be a number.',
-        ]);
-
-        if ($validator->fails()) {
+    public function handle(
+        OptionValidator $validator,
+        #[Config('metronome.tick_rate')]
+        int|float $tickRate,
+    ): int {
+        try {
+            /** @var ValidatedInput $options */
+            $options = $validator->validate([
+                'tick-rate' => $tickRate,
+            ])->safe();
+        } catch (ValidationException $validationException) {
             $this->error('Failed to validate options:');
-            $this->components->bulletList($validator->errors()->all());
+            $this->components->bulletList($validationException->errors());
 
             return self::INVALID;
         }
 
-        /** @var ValidatedInput $options */
-        $options = $validator->safe();
         $tickRate = $options->float('tick-rate');
 
         if ($tickRate > 1) {
