@@ -14,6 +14,7 @@ node_modules/
 # Misc
 # artisan is a generated symlink
 artisan
+storage/framework/testing
 
 # MacOS
 .DS_Store
