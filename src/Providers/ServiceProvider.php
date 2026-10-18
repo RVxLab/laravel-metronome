@@ -7,7 +7,7 @@ namespace RVxLab\Metronome\Providers;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Foundation\Application;
 use RVxLab\Metronome\Commands\MetronomeCommand;
-use RVxLab\Metronome\Validation\EventDispatchValidator;
+use RVxLab\Metronome\Schedule\{EventDispatchValidator, EventTracker};
 
 final class ServiceProvider extends \Illuminate\Support\ServiceProvider
 {
@@ -22,6 +22,8 @@ final class ServiceProvider extends \Illuminate\Support\ServiceProvider
                 cache: $app->make(Cache::class),
             ),
         );
+
+        $this->app->singleton(EventTracker::class);
     }
 
     public function boot(): void

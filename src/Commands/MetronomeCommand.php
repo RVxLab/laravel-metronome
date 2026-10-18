@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace RVxLab\Metronome\Commands;
 
 use Illuminate\Console\{Application as ConsoleApplication, Command};
-use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Container\Attributes\Config;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ValidatedInput;
 use RVxLab\Metronome\EventLoop\SchedulerEventLoop;
-use RVxLab\Metronome\Validation\{EventDispatchValidator, OptionValidator};
+use RVxLab\Metronome\Schedule\{EventFetcher, EventTracker};
+use RVxLab\Metronome\Validation\OptionValidator;
 use Illuminate\Validation\ValidationException;
 
 final class MetronomeCommand extends Command
@@ -48,11 +48,11 @@ final class MetronomeCommand extends Command
         $eventLoop = new SchedulerEventLoop(
             app: $this->laravel,
             phpBinary: ConsoleApplication::phpBinary(),
-            schedule: $this->laravel->make(Schedule::class),
             dispatcher: $this->laravel->make(Dispatcher::class),
             exceptionHandler: $this->laravel->make(ExceptionHandler::class),
             components: $this->outputComponents(),
-            validator: $this->laravel->make(EventDispatchValidator::class),
+            eventFetcher: $this->laravel->make(EventFetcher::class),
+            eventTracker: $this->laravel->make(EventTracker::class),
         );
 
         $eventLoop->run(tickRate: $tickRate);
