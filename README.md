@@ -114,6 +114,10 @@ CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]
 Send `SIGINT` (Ctrl+C) or `SIGTERM` to stop the process cleanly. Laravel's shutdown logic runs before the process
 exits, so process managers like Supervisor and systemd work out of the box.
 
+## Roadmap
+
+Planned features can be found in [todo.txt](./todo.txt).
+
 ## Known limitations
 
 - Last-run state is held in memory and not persisted across process restarts. A task that ran shortly before a crash may
