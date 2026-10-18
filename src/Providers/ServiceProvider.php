@@ -6,7 +6,7 @@ namespace RVxLab\Metronome\Providers;
 
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Foundation\Application;
-use RVxLab\Metronome\Commands\MetronomeCommand;
+use RVxLab\Metronome\Commands\MetronomeStartCommand;
 use RVxLab\Metronome\Schedule\{EventDispatchValidator, EventTracker};
 
 final class ServiceProvider extends \Illuminate\Support\ServiceProvider
@@ -33,7 +33,7 @@ final class ServiceProvider extends \Illuminate\Support\ServiceProvider
         }
 
         $this->commands([
-            MetronomeCommand::class,
+            MetronomeStartCommand::class,
         ]);
 
         $this->mergeConfigFrom(

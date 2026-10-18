@@ -14,7 +14,7 @@ use RVxLab\Metronome\Schedule\{EventFetcher, EventTracker};
 use RVxLab\Metronome\Validation\OptionValidator;
 use Illuminate\Validation\ValidationException;
 
-final class MetronomeCommand extends Command
+final class MetronomeStartCommand extends Command
 {
     protected $signature = <<<CMD
         metronome:start
