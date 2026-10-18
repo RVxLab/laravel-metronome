@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace RVxLab\Metronome\EventLoop;
 
+use Exception;
 use Illuminate\Console\Events\{ScheduledTaskFailed, ScheduledTaskFinished, ScheduledTaskStarting};
 use Illuminate\Console\Scheduling\{CallbackEvent, Event};
 use Illuminate\Console\View\Components\Factory as Output;
@@ -14,7 +15,6 @@ use Illuminate\Support\{Carbon};
 use Revolt\EventLoop;
 use RVxLab\Metronome\Schedule\{EventFetcher, EventTracker};
 use Throwable;
-use Exception;
 
 final class SchedulerEventLoop
 {
