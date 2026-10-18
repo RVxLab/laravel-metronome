@@ -13,7 +13,6 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\{Carbon};
 use Revolt\EventLoop;
 use RVxLab\Metronome\Schedule\{EventFetcher, EventTracker};
-use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 use Exception;
 
@@ -51,7 +50,6 @@ final class SchedulerEventLoop
         $stop = function (): never {
             EventLoop::cancel($this->scheduleTickerId);
             $this->app->terminate();
-            $this->components->warn('Stopping scheduler...', OutputInterface::VERBOSITY_VERBOSE);
             exit(0);
         };
 
