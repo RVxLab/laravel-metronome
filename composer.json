@@ -23,8 +23,7 @@
         "orchestra/testbench": "^10.8 || ^11.0",
         "pestphp/pest": "^3.0",
         "phpstan/phpstan": "^2.1",
-        "rector/rector": "^2.3",
-        "rvxlab/php-cs-fixer-rules": "^2.0"
+        "rector/rector": "^2.3"
     },
     "autoload": {
         "psr-4": {
