@@ -4,7 +4,7 @@ A drop-in replacement for Laravel's built-in scheduler using an event loop inste
 
 ## Requirements
 
-- PHP 8.2+
+- PHP 8.3+
 - Laravel 12+
 - `ext-pcntl`
 

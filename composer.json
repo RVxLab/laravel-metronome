@@ -11,7 +11,7 @@
         }
     ],
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "ext-pcntl": "*",
         "illuminate/console": "^12 || ^13",
         "illuminate/support": "^12 || ^13",
