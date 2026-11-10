@@ -18,7 +18,7 @@
         "revolt/event-loop": "^1.0"
     },
     "require-dev": {
-        "ergebnis/composer-normalize": "^2.48",
+        "ergebnis/composer-normalize": "^2.56",
         "friendsofphp/php-cs-fixer": "^3.92",
         "orchestra/testbench": "^10.8 || ^11.0",
         "pestphp/pest": "^3.0",
