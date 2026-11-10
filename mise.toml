@@ -3,6 +3,14 @@ lefthook = "2"
 node = "24"
 watchexec = "2.8.0"
 
+# See https://github.com/nunomaduro/static-php-builds
+php = {
+    version = "8.3",
+
+    # For the moment, macOS uses Herd
+    os = ["linux"]
+}
+
 [tasks."test:fail-fast"]
 description = "Run tests and stop on first failure"
 run = "composer run test -- --stop-on-defect"
