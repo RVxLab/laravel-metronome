@@ -1,6 +1,7 @@
 [tools]
 lefthook = "2"
 node = "24"
+pnpm = "12.18.0"
 watchexec = "2.8.0"
 
 # See https://github.com/nunomaduro/static-php-builds
@@ -10,6 +11,13 @@ php = {
     # For the moment, macOS uses Herd
     os = ["linux"]
 }
+
+[tasks.init]
+description = "Initialize the project"
+run = '''
+lefthook install
+pnpm install
+'''
 
 [tasks."test:fail-fast"]
 description = "Run tests and stop on first failure"
